@@ -1,5 +1,5 @@
 ###################
-Absensi Karyawan QR Code
+Kartu Transaksi Nurul Huda
 ###################
 
-Absensi Karyawan QR Code dibuat dengan Framework CI- 3 
+Sistem transaksi dibuat dengan Framework CI- 3 

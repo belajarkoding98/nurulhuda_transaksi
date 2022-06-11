@@ -3,11 +3,17 @@
 class Dashboard_model extends Ci_Model{
 
   public function total($table)
-
-
   {
       $query = $this->db->get($table)->num_rows();
       return $query;
+  }
+
+  public function totalNominal($column)
+  {
+    $this->db->select_sum($column)
+    ->from('nasabah');
+$data = $this->db->get();
+      return $data;
   }
 
   function get_maxd($pl){

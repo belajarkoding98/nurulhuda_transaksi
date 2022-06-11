@@ -67,6 +67,8 @@
                         <option value="nasabah">-- PILIH IMPORT --</option>
                         <option value="import_nasabah">
                             IMPORT DATA</option>
+                        <option value="nasabah/import_setoran">
+                            IMPORT SETORAN</option>
                         <option value="import_saldo">
                             IMPORT SALDO</option>
                         <option value="nasabah/import_kas_galon">

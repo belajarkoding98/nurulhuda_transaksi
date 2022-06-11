@@ -111,6 +111,10 @@
                                                                         echo 'selected';
                                                                     } ?>>
                                                 Berobat</option>
+                                                <option value="tabungan" <?php if ($keperluan == "tabungan") {
+                                                                        echo 'selected';
+                                                                    } ?>>
+                                                Tabungan</option>
                                             <option value="lainnya" <?php if ($keperluan == "lainnya") {
                                                                         echo 'selected';
                                                                     } ?>>

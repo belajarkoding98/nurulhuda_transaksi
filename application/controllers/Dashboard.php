@@ -69,6 +69,9 @@ class Dashboard extends CI_Controller
 
 	public function staff_box()
 	{
+		$saldo_sementara = $this->dashboard->totalNominal('saldo_sementara')->row();
+		$saldo_utama = $this->dashboard->totalNominal('saldo_utama')->row();
+		$saldo_pengeluaran = $this->dashboard->totalNominal('pengeluaran')->row();
 		$box = [
 			[
 				'box'         => 'light-blue',
@@ -88,27 +91,27 @@ class Dashboard extends CI_Controller
 			],
 			[
 				'box'         => 'yellow-active',
-				'total'     => 'Rp. ' . rupiah($this->Keuangan_model->total('gedung')),
-				'title'        => 'Saldo Hari Ini',
+				'total'     => 'Rp. ' . rupiah($saldo_sementara->saldo_sementara),
+				'title'        => 'Saldo Sementara',
 				'size_class'        => 'col-lg-6 col-xs-6',
 				'link'        => 'nasabah',
 				'icon'        => 'dollar'
 			],
 			[
 				'box'         => 'red',
-				'total'     => 'Rp. ' . rupiah($this->Keuangan_model->total('shift')),
-				'title'        => 'Saldo Keseluruhan',
+				'total'     => 'Rp. ' . rupiah($saldo_utama->saldo_utama),
+				'title'        => 'Saldo Utama',
 				'size_class'        => 'col-lg-6 col-xs-6',
 				'link'        => 'nasabah',
 				'icon'        => 'dollar'
 			],
 			[
-				'box'         => 'red',
-				'total'     => 'Rp. ' . rupiah($this->Keuangan_model->total('shift')),
-				'title'        => 'Saldo Bulan Ini',
+				'box'         => 'primary',
+				'total'     => 'Rp. ' . rupiah($saldo_pengeluaran->pengeluaran),
+				'title'        => 'Saldo Pengeluaran',
 				'size_class'        => 'col-lg-6 col-xs-6',
 				'link'        => 'nasabah',
-				'icon'        => 'calendar'
+				'icon'        => 'dollar'
 			],
 		];
 		$info_box = json_decode(json_encode($box), FALSE);

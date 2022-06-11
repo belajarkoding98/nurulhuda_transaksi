@@ -5,7 +5,7 @@
     <!--- basic page needs
     ================================================== -->
     <meta charset="utf-8">
-    <title>Kehilangan Kartu | Sistem Nurul Huda</title>
+    <title>Cek Saldo | Sistem Nurul Huda</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -66,17 +66,16 @@
 
                 <div class="home-content__left">
                     <h1>
-                    Kehilangan kartu <br>
-                    Transaksi?
+                    Cek Saldo
                     </h1>
     
                     <h3 style="color: white;">
-                    Kami memudahkan Ibu/Bapak/Wali Santri/Santri untuk melaporkan kehilangan kartu, dengan menginputkan Nama Santri, Kelas, Orang Tua
+                    Kami memudahkan Ibu/Bapak/Wali Santri/Santri untuk mengecek saldo dengan menginputkan Nomor Pokok Santri
                     </h3>
     
                     <div class="home-content__btn-wrap">
                         <a href="#footer" class="btn btn--primary home-content__btn smoothscroll CariDataKartu">
-                            Cari Data Kartu
+                            Cek Saldo
                         </a>
                     </div>
                 </div> <!-- end home-content__left-->

@@ -67,6 +67,24 @@
                             </div>
                             <div class="help-block with-errors"></div>
                         </div>
+                        <div class="form-group">
+                            <label for="icon" class="control-label">Level Menu</label>
+                            <div class="input-group">
+                                <select name="is_parent" class="form-control">
+                                    <option value="0">Pilih Level</option>
+                                    <?php
+                                    $menu = $this->db->get('groups');
+                                    foreach ($menu->result() as $m) {
+                                        echo "<option value='$m->id' ";
+                                        echo $m->id == $is_parent ? 'selected' : '';
+                                        echo ">" .  strtoupper($m->description) . "</option>";
+                                    } ?>
+                                </select> <span class="input-group-addon">
+                                    <span class="fas fa-grip-vertical"></span>
+                                </span>
+                            </div>
+                            <div class="help-block with-errors"></div>
+                        </div>
                         <input type="hidden" name="id" value="<?php echo $id; ?>" />
                         <button type="submit" class="btn btn-primary"><?php echo $button ?></button>
                         <a href="<?php echo site_url('menu') ?>" class="btn btn-default">Cancel</a>

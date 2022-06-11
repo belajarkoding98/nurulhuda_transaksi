@@ -320,6 +320,24 @@ class Nasabah extends CI_Controller
         $this->template->load('template/template', 'keuangan/nasabah/nasabah_import', $data);
     }
 
+    public function import_setoran()
+    {
+        $chek = $this->ion_auth->is_admin();
+
+        if (!$chek) {
+            $hasil = 0;
+        } else {
+            $hasil = 1;
+        }
+        $user = $this->user;
+        // $siswa = $this->Siswa_model->get_all_query();
+        $data = array(
+            'user' => $user, 'users'     => $this->ion_auth->user()->row(),
+            'result' => $hasil,
+        );
+        $this->template->load('template/template', 'keuangan/nasabah/nasabah_import_setoran', $data);
+    }
+
     public function import_saldo()
     {
         $chek = $this->ion_auth->is_admin();
@@ -721,8 +739,11 @@ class Nasabah extends CI_Controller
                     $this->Keuangan_model->updateNominal($row->nps, ['saldo_utama' => $saldo]);
                 }
             } else {
-                $saldo_s = ($nasabah->saldo_utama) - ($row->kredit);
-                $this->Keuangan_model->updateNominal($row->nps, ['saldo_sementara' => $saldo, 'saldo_utama' => $saldo_s]);
+                if($row->keperluan == "setoran"){
+                    $saldo_u = ($nasabah->saldo_utama) - ($row->kredit); //kurangi saldo sementara
+                    $this->Keuangan_model->updateNominal($row->nps, ['saldo_utama' => $saldo_u]);
+                }else{
+                }
             }
             $this->Keuangan_model->deletetransaksi('transaksi', $id, 'id_transaksi');
             $this->session->set_flashdata('messageAlert', $this->messageAlert('success', 'Berhasil menghapus data'));
@@ -1007,6 +1028,59 @@ class Nasabah extends CI_Controller
         }
 
         $this->template->load('template/template', 'keuangan/nasabah/nasabah_import_saldo', $data);
+    }
+
+    public function form_import_setoran()
+    {
+        // $this->filename = "data" . date('Ymd');
+        // $data = array(); // Buat variabel $data sebagai array
+
+        $chek = $this->ion_auth->is_admin();
+
+        if (!$chek) {
+            $hasil = 0;
+        } else {
+            $hasil = 1;
+        }
+        $user = $this->user;
+        // $siswa = $this->Siswa_model->get_all_query();
+        $data = array(
+            'user' => $user,
+            'users'     => $this->ion_auth->user()->row(),
+            'result' => $hasil,
+        );
+
+        if (isset($_POST['preview'])) {
+            $tgl_sekarang = date('Ym'); // Ini akan mengambil waktu sekarang dengan format yyyymmddHHiiss
+            $nama_file_baru = 'import_data_setoran' . $tgl_sekarang . '.xlsx';
+    
+            // Cek apakah terdapat file data.xlsx pada folder tmp
+            // if (is_file('excel/' . $nama_file_baru)) // Jika file tersebut ada
+                // unlink('excel/' . $nama_file_baru); // Hapus file tersebut
+    
+            $ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION); // Ambil ekstensi filenya apa
+            $tmp_file = $_FILES['file']['tmp_name'];
+    
+            // Cek apakah file yang diupload adalah file Excel 2007 (.xlsx)
+            if ($ext == "xlsx") {
+                // Upload file yang dipilih ke folder tmp
+                // dan rename file tersebut menjadi data{tglsekarang}.xlsx
+                // {tglsekarang} diganti jadi tanggal sekarang dengan format yyyymmddHHiiss
+                // Contoh nama file setelah di rename : data20210814192500.xlsx
+                move_uploaded_file($tmp_file, 'excel/' . $nama_file_baru);
+    
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+                $spreadsheet = $reader->load('excel/' . $nama_file_baru); // Load file yang tadi diupload ke folder tmp
+                $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+                $data['sheet'] = $sheet;
+                $data['nama_file_baru'] = $nama_file_baru;
+            } else { // Jika proses upload gagal
+                $data['upload_error'] = $tmp_file['error']; // Ambil pesan error uploadnya untuk dikirim ke file form dan ditampilkan
+                $this->session->set_flashdata('messageAlert', $this->messageAlert('danger', 'Data Gagal di Preview'));
+            }
+        }
+
+        $this->template->load('template/template', 'keuangan/nasabah/nasabah_import_setoran', $data);
     }
 
     public function form_kas_galon()
@@ -1308,6 +1382,105 @@ class Nasabah extends CI_Controller
         // var_dump($data_saldo);
         $this->session->set_flashdata('messageAlert', $this->messageAlert('success', 'Data Saldo Berhasil di Import'));
         redirect(site_url("nasabah")); // Redirect ke halaman awal (ke controller siswa fungsi index)
+
+    }
+
+    public function import_data_setoran()
+    {
+        if(isset($_POST['import'])){ // Jika user mengklik tombol Import
+            $nama_file_baru = $_POST['namafile'];
+            $path = 'excel/' . $nama_file_baru; // Set tempat menyimpan file tersebut dimana
+        
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $spreadsheet = $reader->load($path); // Load file yang tadi diupload ke folder tmp
+            $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+        
+            
+            
+            $cek_urutan = $this->Siswa_model->getOneData();
+            $id = $cek_urutan['id'];
+            
+            if (empty($id)) {
+                $no = 0;
+            } else {
+                $no = $id;
+            }
+
+            for ($x = 1; $x <= count($sheet); $x++) {
+                $data_nps[] =
+                    $sheet[$x]['C'];
+            }
+    
+            $cek_saldo = $this->Keuangan_model->get_all_nasabah($data_nps)->result_array();
+
+        $i=0;
+        $numrow = 1;
+        foreach ($sheet as $row) {
+            $no  = $row['A']; // Insert data nis dari kolom A di excel
+            $id_nasabah  = $row['B']; // Insert data nasabah dari kolom B di excel
+            $nps  = $row['C']; // Insert data nis dari kolom A di excel
+            $kode_kelas  = $row['E'];
+            $setoran_sementara  = (int) filter_var($row['F'], FILTER_SANITIZE_NUMBER_INT); // Insert data nis dari kolom A di excel
+            
+ 	// Cek jika semua data tidak diisi
+     if($no == "" && $id_nasabah == "" && $nps == ""  && $kode_kelas == "")
+     continue; // Lewat data pada baris ini (masuk ke looping selanjutnya / baris selanjutnya)
+
+
+            if ($numrow > 1) {
+                $temp_nps = $this->Keuangan_model->QueryExist($nps)->result_array();
+                if($temp_nps){
+                    $d_kredit = array('nps' => $nps, 'keperluan' => 'setoran');
+                    $d_debit = array('nps' => $nps);
+                    $d_jajan = array('nps' => $nps, 'keperluan' => 'jajan');
+                    $d_pribadi = array('nps' => $nps, 'keperluan' => 'pribadi');
+                    $cek_kredit = $this->Keuangan_model->getDataTransaksiNasabah('kredit', $d_kredit)->row();
+                    $cek_debit = $this->Keuangan_model->getDataTransaksiNasabah('debit', $d_debit)->row();
+                    $cek_jajan = $this->Keuangan_model->getDataTransaksiNasabah('debit', $d_jajan)->row();
+                    $cek_pribadi = $this->Keuangan_model->getDataTransaksiNasabah('debit', $d_pribadi)->row();
+
+                    // var_dump($cek_kredit->kredit);
+                    if($cek_kredit){
+                        $saldo_utama = ((int)$cek_kredit->kredit - (int)$cek_debit->debit ) + (int)$setoran_sementara;
+                    }else{
+                        $saldo_utama = (int)$cek_kredit->kredit;
+                    }
+
+                    //insert data debit
+                    $data_kredit = array(
+                        'id_transaksi' => date('ymdHis') . $no,
+                        'id_nasabah' => $id_nasabah,
+                        'nps' => $nps,
+                        'tanggal' => date('y-m-d H:i:s'),
+                        'kredit' => $setoran_sementara,
+                        'debit' => '0',
+                        'saldo' => $saldo_utama,
+                        'keperluan' => 'setoran',
+                        'keterangan' => 'Uang Setoran ' . date('d M Y'),
+                    );
+                    //update data saldo
+                    $data_saldo = array(
+                        'nps' => $nps, // Insert data nis dari kolom A di excel
+                        'kode_kelas' => $kode_kelas,
+                        'saldo_utama' => (int)$saldo_utama, // Insert data nis dari kolom A di excel
+                    );
+
+                    $this->Keuangan_model->insert_transaksi('transaksi', $data_kredit);
+                    $this->Keuangan_model->updateNominal($nps, $data_saldo);
+
+                }else{
+
+                }
+            }
+            if($i != $numrow -1){
+                $i++;
+            }
+            $numrow++; // Tambah 1 setiap kali looping
+            // var_dump($cek_kredit);
+        }
+    }
+        $this->session->set_flashdata('messageAlert', $this->messageAlert('success', 'Data Saldo Berhasil di Import'));
+        redirect(site_url("nasabah")); // Redirect ke halaman awal (ke controller nasabah fungsi index)
 
     }
 

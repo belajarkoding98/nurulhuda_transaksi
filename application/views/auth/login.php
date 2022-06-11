@@ -71,7 +71,6 @@
                     <!-- /.col -->
                 </div>
                 <?= form_close(); ?>
-                <p align='center'><b>Gunakan User dibawah ini</b></p>
                 <br>
                 <center>
                     <p>Created by <a href='#' title='Muhammad Jahidin' target='_blank'>Muhammad Jahidin</a></p>

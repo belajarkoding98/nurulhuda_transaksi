@@ -68,6 +68,7 @@ class Menu extends CI_Controller
             'icon' => set_value('icon'),
             'is_active' => set_value('is_active'),
             'is_parent' => set_value('is_parent'),
+            'level' => set_value('level'),
             'user' => $user, 'users'     => $this->ion_auth->user()->row(),
         );
         $this->template->load('template/template', 'menu/menu_form', $data);
@@ -85,6 +86,7 @@ class Menu extends CI_Controller
                 'icon' => $this->input->post('icon', TRUE),
                 'is_active' => $this->input->post('is_active', TRUE),
                 'is_parent' => $this->input->post('is_parent', TRUE),
+                'level' => $this->input->post('level', TRUE),
             );
 
             $this->Menu_model->insert($data);

@@ -143,21 +143,21 @@ $(document).ready(function() {
             {
                 extend: 'csv',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10],
                 },
             },
             {
                 extend: 'excel',
                 title: 'Data Transaksi '+NamaNasabah,
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10],
                 },
             },
             {
                 extend: 'copy',
                 title: 'Data Transaksi '+NamaNasabah,
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10],
                 },
             },
             {
@@ -167,7 +167,7 @@ $(document).ready(function() {
                 pageSize: 'A4',
                 download: 'open',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10],
                 },
                 customize: function(doc) {
                     doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
@@ -181,7 +181,7 @@ $(document).ready(function() {
                 pageSize: 'A4',
                 title: 'Data Transaksi '+NamaNasabah,
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10],
                 },
             },
         ],

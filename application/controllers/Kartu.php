@@ -10,9 +10,9 @@ class Kartu extends CI_Controller
     {
 
         parent::__construct();
-        if (!$this->ion_auth->logged_in()) {
-            redirect('auth');
-        }
+        // if (!$this->ion_auth->logged_in()) {
+        //     redirect('auth');
+        // }
 
         $this->load->library('user_agent');
         $this->load->model(array('Kelas_model', 'Keuangan_model', 'Jenjang_model', 'Kartu_model'));
@@ -69,6 +69,27 @@ class Kartu extends CI_Controller
         $this->load->view('template/datatables', $data);
     }
 
+    public function create_kehilangan()
+    {
+        $chek = $this->ion_auth->is_admin();
+
+        if (!$chek) {
+            $hasil = 0;
+        } else {
+            $hasil = 1;
+        }
+        $user = $this->user;
+        // $kartu = $this->Kartu_model->getDataKartu()->result();
+        $data = array(
+            // 'kartu_data' => $kartu,
+            'user' => $user, 'users' => $this->ion_auth->user()->row(),
+            'result' => $hasil,
+        );
+        // var_dump($nasabah);
+        $this->template->load('template/template', 'kartu/kartu_form', $data);
+        $this->load->view('template/datatables', $data);
+    }
+
     public function create_action()
     {
         $kode_kelas = $this->input->post('kode_kelas', TRUE);
@@ -102,6 +123,7 @@ class Kartu extends CI_Controller
                 'orang_tua' => $cek_data->orang_tua,
                 'keterangan' => $keterangan,
                 'foto' => $tmp_foto,
+                'bayar' => 0,
                 'status' => 1,
             ];
                 // var_dump($data_kartu);
@@ -159,6 +181,75 @@ class Kartu extends CI_Controller
             return $tmp_foto;
         }
 
+    }
+
+    public function bayarkartu()
+    {
+        if (!$this->ion_auth->is_admin()) {
+            show_error('Hanya Administrator yang diberi hak untuk mengakses halaman ini, <a href="' . base_url('dashboard') . '">Kembali ke menu awal</a>', 403, 'Akses Dilarang!');
+        }
+        //get uang kartu dari inputan
+        $uangkartu = $this->input->post('nominalkartu', TRUE);
+        $id = $this->input->post('id', TRUE);
+        $row = $this->Kartu_model->get_by_id($id)->row();
+        $nps = $row->nps;
+        $nasabah = $this->Keuangan_model->get_by_idnasabah($nps);
+        if ($row) {
+            //cek saldo dulu
+            $d_kredit = array('nps' => $nps, 'keperluan' => 'setoran');
+            $d_debit = array('nps' => $nps);
+            $cek_kredit = $this->Keuangan_model->getDataTransaksiNasabah('kredit', $d_kredit)->row();
+            $cek_debit = $this->Keuangan_model->getDataTransaksiNasabah('debit', $d_debit)->row();
+
+            // var_dump($cek_kredit->kredit);
+            if($cek_debit){
+                $saldo = (int)$cek_kredit->kredit - (int)$cek_debit->debit - (int) filter_var($uangkartu, FILTER_SANITIZE_NUMBER_INT);
+            }else{
+                $saldo = (int)$cek_kredit->kredit -  (int) filter_var($uangkartu, FILTER_SANITIZE_NUMBER_INT);
+            }
+
+
+            $data_kredit = array(
+                'id_transaksi' => date('ymdHis') . $id,
+                'id_nasabah' => $nasabah->id_nasabah,
+                'nps' => $nasabah->nps,
+                'tanggal' => date('y-m-d H:i:s'),
+                'kredit' => '0',
+                'debit' => (int) filter_var($uangkartu, FILTER_SANITIZE_NUMBER_INT),
+                'saldo' => $saldo,
+                'keperluan' => 'lainnya',
+                'keterangan' => 'Biaya Pembuatan Kartu Hilang ' . date('d M Y'),
+            );
+            $this->Keuangan_model->insert_transaksi('transaksi', $data_kredit);
+
+            $data_kartu = [
+                'bayar' => (int) filter_var($uangkartu, FILTER_SANITIZE_NUMBER_INT)
+            ]; 
+            $this->Kartu_model->update($id, $data_kartu);
+            $this->Keuangan_model->updateNominal($nps, ['saldo_utama' => $saldo]);
+            $this->session->set_flashdata('messageAlert', $this->messageAlert('success', 'Berhasil Bayar biaya pembuatan Kartu'));
+            redirect(site_url('kartu/report_kartu'));
+        } else {
+            $this->session->set_flashdata('messageAlert', $this->messageAlert('danger', 'data tidak ditemukan'));
+            redirect(site_url('kartu/report_kartu'));
+            // redirect(site_url('siswa'));
+        }
+    }
+    public function delete($id)
+    {
+        if (!$this->ion_auth->is_admin()) {
+            show_error('Hanya Administrator yang diberi hak untuk mengakses halaman ini, <a href="' . base_url('dashboard') . '">Kembali ke menu awal</a>', 403, 'Akses Dilarang!');
+        }
+        $row = $this->Kartu_model->get_by_id($this->uri->segment(3));
+        if ($row) {
+            $this->Kartu_model->delete($id);
+            $this->session->set_flashdata('messageAlert', $this->messageAlert('success', 'Berhasil menghapus Data Kehilangan Kartu'));
+            redirect(site_url('nasabah'));
+        } else {
+            $this->session->set_flashdata('messageAlert', $this->messageAlert('danger', 'data tidak ditemukan'));
+            redirect(site_url('nasabah'));
+            // redirect(site_url('siswa'));
+        }
     }
 
     public function output_json($data, $encode = true)

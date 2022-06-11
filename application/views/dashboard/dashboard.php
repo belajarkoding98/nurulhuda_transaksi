@@ -55,7 +55,7 @@
     <?php if ($this->ion_auth->is_admin()) : ?>
         <div class="row">
             <?php foreach ($info_box as $info) : ?>
-                <div class="col-lg-3 col-xs-6">
+                <div class="<?= $info->size_class ?>">
                     <div class="small-box bg-<?= $info->box ?>">
                         <div class="inner">
                             <h3><?= $info->total; ?></h3>

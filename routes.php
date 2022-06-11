@@ -101,6 +101,7 @@ $route['update_status_kartu'] = 'kartu/update_kartu';
 //Upload Data Excel
 $route['import_siswa'] = 'siswa/import_siswa';
 $route['import_nasabah'] = 'nasabah/import_nasabah';
+// $route['import_setoran'] = 'nasabah/import_setoran';
 $route['import_saldo'] = 'nasabah/import_saldo';
 $route['import_lainnya'] = 'nasabah/import_lainnya';
 $route['transaksi_nasabah/(:num)'] = 'nasabah/transaksi_nasabah/$1';
@@ -115,9 +116,14 @@ $route['create_debit'] = 'nasabah/create_debit';
 $route['update_kredit'] = 'nasabah/update_kredit';
 $route['update_debit'] = 'nasabah/update_debit';
 
+//kehilangan kartu
+$route['tambah_kehilangan_kartu'] = 'kartu/create_kehilangan';
+
+
 //menu
 $route['laporan_laundry'] = 'laporan/laundry';
 $route['laporan_berobat'] = 'laporan/berobat';
 $route['laporan_kas_galon'] = 'laporan/kas_galon';
 $route['laporan_cukur'] = 'laporan/cukur';
 $route['laporan_transaksi'] = 'laporan/transaksi';
+$route['laporan_tabungan'] = 'laporan/tabungan';

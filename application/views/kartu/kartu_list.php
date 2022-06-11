@@ -60,7 +60,7 @@
                 <div class='box-header  with-border'>
                     <h3 class='box-title'>DATA Kehilangan Kartu</h3>
                     <div class="pull-right">
-                    <?php echo anchor(site_url('tambah_nasabah'), ' <i class="fa fa-plus"></i> &nbsp;&nbsp; Tambah Baru', ' class="btn btn-unique btn-lg btn-create-data btn3d" hidden="true"'); ?>
+                    <?php echo anchor(site_url('kartu/create_kehilangan'), ' <i class="fa fa-plus"></i> &nbsp;&nbsp; Tambah Baru', ' class="btn btn-unique btn-lg btn-create-data btn3d" hidden="true"'); ?>
                     </div>
                         <!-- <php echo anchor(site_url('import_saldo'), ' <i class="fa fa-dollar"></i> &nbsp;&nbsp; Import Saldo', ' class="btn btn-warning btn-lg btn-create-data btn3d" id="importsaldo" hidden="true"'); ?> -->
                         <!-- <php echo anchor(site_url('import_nasabah'), ' <i class="fa fa-file-upload"></i> &nbsp;&nbsp; Import Data', ' class="btn btn-success btn-lg btn-create-data btn3d" hidden="true"'); ?> -->
@@ -141,6 +141,29 @@ foreach ($kartu_data as $i) :
             </div>
         </div>
     </div>
+
+    <div class="modal" id="modal_bayar<?= $id ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Bayar Kehilangan Kartu <?= $i->nama_siswa ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="myForm" data-toggle="validator" action="<?= base_url('/kartu/bayarkartu') ?>" method="post">
+                        <input type="hidden" class="form-control" name="id" id="id" placeholder=" Masukan nominal saldo" value="<?= $id ?>" />
+                        <input type="text" class="form-control" name="nominalkartu" id="nominalkartu" placeholder=" Masukan nominal Kartu" value="" autofocus/>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="simpan">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 <?php endforeach; ?>
 <script type="text/javascript">
     let base_url = '<?= base_url() ?>';
@@ -170,14 +193,39 @@ foreach ($kartu_data as $i) :
 
     $(document).ready(function(){
         $(':input[type="submit"]').prop('disabled', true);
-        $('select[name="status"]').on('change', function(){
-            if($(this).val() == "0"){
+        $('input[type="text"]').on('keyup', function(){
+            if($(this).val() == ""){
                 $(':input[type="submit"]').prop('disabled', true);
             }else{
                 $(':input[type="submit"]').prop('disabled', false);
             }
         });
     });
+
+    var dengan_rupiah = document.getElementById('nominalkartu');
+    dengan_rupiah.addEventListener('keyup',
+        function(e) {
+            // document.getElementById('no_rupiah').value = dengan_rupiah.value;
+            dengan_rupiah.value = formatRupiah(this.value, 'Rp. ');
+        });
+
+    function formatRupiah(angka, prefix) {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+    }
+
 </script>
 <!-- <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script> -->
 

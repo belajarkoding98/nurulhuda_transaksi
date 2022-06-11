@@ -148,6 +148,28 @@ class Laporan extends CI_Controller
         $this->template->load('template/template', 'laporan/cukur_list', $data);
         $this->load->view('template/datatables', $data);
     }
+    
+    public function tabungan()
+    {
+        if (!$this->ion_auth->is_admin()) {
+            show_error('Hanya Administrator yang diberi hak untuk mengakses halaman ini, <a href="' . base_url('dashboard') . '">Kembali ke menu awal</a>', 403, 'Akses Dilarang!');
+        }
+        $chek = $this->ion_auth->is_admin();
+
+        if (!$chek) {
+            $hasil = 0;
+        } else {
+            $hasil = 1;
+        }
+        $user = $this->user;
+
+        $data = array(
+            'user' => $user, 'users'     => $this->ion_auth->user()->row(),
+            'result' => $hasil,
+        );
+        $this->template->load('template/template', 'laporan/tabungan_list', $data);
+        $this->load->view('template/datatables', $data);
+    }
 
     public function output_json($data, $encode = true)
     {
@@ -173,6 +195,13 @@ class Laporan extends CI_Controller
     {
         // $id = $this->input->post('id');
         $id = 'berobat';
+        $this->output_json($this->Keuangan_model->getDataKeperluan($id), false);
+    }
+
+    public function tabungandata()
+    {
+        // $id = $this->input->post('id');
+        $id = 'tabungan';
         $this->output_json($this->Keuangan_model->getDataKeperluan($id), false);
     }
 

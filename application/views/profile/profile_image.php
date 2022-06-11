@@ -7,7 +7,7 @@
 <div class="box-body box-profile">
     <div id="crop-avatar">
         <div class="avatar-view">
-            <img class="profile-user-img img-responsive img-circle" src="<?php echo base_url() ?>assets/dist/img/user4-160x160.jpg" alt="User profile picture">
+            <img class="profile-user-img img-responsive img-circle" src="<?php echo base_url('assets/dist/img/'.$profile->image) ?>" alt="User profile picture">
             <h3 class="profile-username text-center">
                 <?php echo $profile->first_name; ?>&nbsp;<?php echo $profile->last_name; ?>
             </h3>

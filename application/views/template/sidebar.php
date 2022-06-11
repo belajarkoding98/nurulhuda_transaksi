@@ -4,7 +4,7 @@
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<?php echo base_url() ?>/assets/dist/img/Yayasan_nurulhuda.png" class="img-circle" alt="User Image">
+                <img src="<?php echo base_url('/assets/dist/img/'.$user->image) ?>" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
                 <p><?= $user->first_name . ' ' . $user->last_name ?></p>
@@ -27,6 +27,7 @@
                     </a>
                 </li>
                 <?php
+                
                 $menu = $this->db->get_where('menu', array('is_parent' => 0, 'is_active' => 1));
                 foreach ($menu->result() as $m) {
                     // chek ada sub menu

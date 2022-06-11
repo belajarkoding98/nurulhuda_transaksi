@@ -30,20 +30,20 @@ class Kartu_model extends CI_Model
     // get all data
     function get()
     {
-        $this->datatables->select('id, tanggal, nps, nama_siswa, kode_kelas, orang_tua, keterangan, status, foto')
+        $this->datatables->select('id, tanggal, nps, nama_siswa, kode_kelas, orang_tua, keterangan, status, bayar, foto')
             ->from($this->table);
         return $this->datatables->generate();
     }
     function getDataKartu()
     {
-        $this->db->select('id, tanggal, nps, nama_siswa, kode_kelas, orang_tua, keterangan, status, foto')
+        $this->db->select('id, tanggal, nps, nama_siswa, kode_kelas, orang_tua, keterangan, status, bayar, foto')
         ->from($this->table);
         return $this->db->get();
     }
     // get data by id
-    function get_by_nps($id)
+    function get_by_id($id)
     {
-        $this->db->where('nps', $id);
+        $this->db->where('id', $id);
         return $this->db->get($this->table);
     }
     // update data
